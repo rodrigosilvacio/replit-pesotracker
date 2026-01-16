@@ -3,20 +3,21 @@ import { db } from "./db";
 import { eq, asc, and } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, data: Partial<Pick<User, "goalWeight">>): Promise<User | undefined>;
   
-  getAllWeights(): Promise<Weight[]>;
+  getAllWeights(userId: number): Promise<Weight[]>;
   getWeight(id: number): Promise<Weight | undefined>;
-  getWeightByDateTime(date: string, time: string): Promise<Weight | undefined>;
+  getWeightByDateTime(userId: number, date: string, time: string): Promise<Weight | undefined>;
   createWeight(weight: InsertWeight): Promise<Weight>;
-  updateWeight(id: number, data: Partial<InsertWeight>): Promise<Weight | undefined>;
+  updateWeight(id: number, data: Partial<Pick<InsertWeight, "date" | "time" | "weight">>): Promise<Weight | undefined>;
   deleteWeight(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
@@ -31,8 +32,15 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getAllWeights(): Promise<Weight[]> {
-    return await db.select().from(weights).orderBy(asc(weights.date), asc(weights.time));
+  async updateUser(id: number, data: Partial<Pick<User, "goalWeight">>): Promise<User | undefined> {
+    const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+    return user || undefined;
+  }
+
+  async getAllWeights(userId: number): Promise<Weight[]> {
+    return await db.select().from(weights)
+      .where(eq(weights.userId, userId))
+      .orderBy(asc(weights.date), asc(weights.time));
   }
 
   async getWeight(id: number): Promise<Weight | undefined> {
@@ -40,9 +48,9 @@ export class DatabaseStorage implements IStorage {
     return weight || undefined;
   }
 
-  async getWeightByDateTime(date: string, time: string): Promise<Weight | undefined> {
+  async getWeightByDateTime(userId: number, date: string, time: string): Promise<Weight | undefined> {
     const [weight] = await db.select().from(weights).where(
-      and(eq(weights.date, date), eq(weights.time, time))
+      and(eq(weights.userId, userId), eq(weights.date, date), eq(weights.time, time))
     );
     return weight || undefined;
   }
@@ -52,7 +60,7 @@ export class DatabaseStorage implements IStorage {
     return weight;
   }
 
-  async updateWeight(id: number, data: Partial<InsertWeight>): Promise<Weight | undefined> {
+  async updateWeight(id: number, data: Partial<Pick<InsertWeight, "date" | "time" | "weight">>): Promise<Weight | undefined> {
     const [weight] = await db
       .update(weights)
       .set(data)
