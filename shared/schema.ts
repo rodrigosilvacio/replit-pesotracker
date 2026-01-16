@@ -1,19 +1,21 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, real, serial, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, real, serial, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   goalWeight: real("goal_weight"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const weights = pgTable("weights", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
   date: text("date").notNull(),
   time: text("time").notNull(),
   weight: real("weight").notNull(),

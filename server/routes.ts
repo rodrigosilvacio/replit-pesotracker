@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import session from "express-session";
 import { storage } from "./storage";
-import { registerUserSchema, loginUserSchema, insertWeightSchema, updateWeightSchema, updateUserSchema } from "@shared/schema";
+import { registerUserSchema, loginUserSchema, updateWeightSchema, updateUserSchema } from "@shared/schema";
 import { hashPassword, verifyPassword, requireAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {

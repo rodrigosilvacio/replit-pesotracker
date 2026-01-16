@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, StyleSheet, RefreshControl, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -9,9 +9,11 @@ import { SummaryCards } from "@/components/SummaryCards";
 import { WeightForm } from "@/components/WeightForm";
 import { WeightChart } from "@/components/WeightChart";
 import { WeightTable } from "@/components/WeightTable";
+import { GoalReachedModal } from "@/components/GoalReachedModal";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { Spacing } from "@/constants/theme";
 import {
   useWeights,
@@ -27,15 +29,26 @@ export default function HomeScreen() {
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const [editingWeight, setEditingWeight] = useState<Weight | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [showGoalReached, setShowGoalReached] = useState(false);
+  const [goalReachedWeight, setGoalReachedWeight] = useState<number>(0);
 
   const { data: weights, isLoading, refetch, isRefetching } = useWeights();
   const summary = useWeightSummary(weights);
   const createMutation = useCreateWeight();
   const updateMutation = useUpdateWeight();
   const deleteMutation = useDeleteWeight();
+
+  const checkGoalReached = useCallback((newWeight: number) => {
+    if (user?.goalWeight && newWeight <= user.goalWeight) {
+      setGoalReachedWeight(newWeight);
+      setShowGoalReached(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+  }, [user?.goalWeight]);
 
   const handleSubmit = useCallback(
     async (data: { date: string; time: string; weight: number }) => {
@@ -45,9 +58,11 @@ export default function HomeScreen() {
           await updateMutation.mutateAsync({ id: editingWeight.id, data });
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           setEditingWeight(null);
+          checkGoalReached(data.weight);
         } else {
           await createMutation.mutateAsync(data);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          checkGoalReached(data.weight);
         }
       } catch (error: any) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -59,7 +74,7 @@ export default function HomeScreen() {
         }
       }
     },
-    [editingWeight, createMutation, updateMutation, t]
+    [editingWeight, createMutation, updateMutation, t, checkGoalReached]
   );
 
   const handleEdit = useCallback((weight: Weight) => {
@@ -108,43 +123,54 @@ export default function HomeScreen() {
   }
 
   return (
-    <KeyboardAwareScrollViewCompat
-      style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
-      contentContainerStyle={[
-        styles.content,
-        {
-          paddingTop: headerHeight + Spacing.lg,
-          paddingBottom: insets.bottom + Spacing.xl,
-        },
-      ]}
-      scrollIndicatorInsets={{ bottom: insets.bottom }}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefetching}
-          onRefresh={handleRefresh}
-          tintColor={theme.primary}
+    <>
+      <KeyboardAwareScrollViewCompat
+        style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: headerHeight + Spacing.lg,
+            paddingBottom: insets.bottom + Spacing.xl,
+          },
+        ]}
+        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={handleRefresh}
+            tintColor={theme.primary}
+          />
+        }
+      >
+        <SummaryCards summary={summary} />
+
+        <WeightForm
+          onSubmit={handleSubmit}
+          editingWeight={editingWeight}
+          onCancelEdit={handleCancelEdit}
+          isLoading={createMutation.isPending || updateMutation.isPending}
+          error={formError}
         />
-      }
-    >
-      <SummaryCards summary={summary} />
 
-      <WeightForm
-        onSubmit={handleSubmit}
-        editingWeight={editingWeight}
-        onCancelEdit={handleCancelEdit}
-        isLoading={createMutation.isPending || updateMutation.isPending}
-        error={formError}
-      />
+        <WeightChart weights={weights || []} />
 
-      <WeightChart weights={weights || []} />
+        <WeightTable
+          weights={weights || []}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          isDeleting={deleteMutation.isPending}
+        />
+      </KeyboardAwareScrollViewCompat>
 
-      <WeightTable
-        weights={weights || []}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        isDeleting={deleteMutation.isPending}
-      />
-    </KeyboardAwareScrollViewCompat>
+      {user?.goalWeight ? (
+        <GoalReachedModal
+          visible={showGoalReached}
+          onDismiss={() => setShowGoalReached(false)}
+          goalWeight={user.goalWeight}
+          currentWeight={goalReachedWeight}
+        />
+      ) : null}
+    </>
   );
 }
 

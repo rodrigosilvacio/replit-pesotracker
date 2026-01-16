@@ -2,7 +2,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "@/screens/HomeScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { HeaderActions } from "@/components/HeaderActions";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 
 export type HomeStackParamList = {
@@ -21,7 +21,7 @@ export default function HomeStackNavigator() {
         component={HomeScreen}
         options={{
           headerTitle: () => <HeaderTitle />,
-          headerRight: () => <LanguageSelector />,
+          headerRight: () => <HeaderActions />,
         }}
       />
     </Stack.Navigator>

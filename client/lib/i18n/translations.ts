@@ -4,11 +4,40 @@ export interface Translations {
   app: {
     title: string;
   };
+  auth: {
+    login: string;
+    register: string;
+    logout: string;
+    username: string;
+    password: string;
+    confirmPassword: string;
+    goalWeight: string;
+    goalWeightHint: string;
+    loginButton: string;
+    registerButton: string;
+    noAccount: string;
+    hasAccount: string;
+    signUp: string;
+    signIn: string;
+    welcome: string;
+    welcomeBack: string;
+    createAccount: string;
+    trackYourWeight: string;
+    usernameRequired: string;
+    passwordRequired: string;
+    passwordMinLength: string;
+    passwordsMatch: string;
+    invalidCredentials: string;
+    usernameTaken: string;
+    registerFailed: string;
+    loginFailed: string;
+  };
   summary: {
     current: string;
     change: string;
     lowest: string;
     highest: string;
+    goal: string;
     kg: string;
   };
   form: {
@@ -43,6 +72,11 @@ export interface Translations {
     cancel: string;
     delete: string;
   };
+  goalReached: {
+    title: string;
+    message: string;
+    dismiss: string;
+  };
   loading: {
     loadingData: string;
   };
@@ -62,11 +96,40 @@ export const translations: Record<Language, Translations> = {
     app: {
       title: "Peso Tracker",
     },
+    auth: {
+      login: "Entrar",
+      register: "Cadastrar",
+      logout: "Sair",
+      username: "Nome de usuário",
+      password: "Senha",
+      confirmPassword: "Confirmar senha",
+      goalWeight: "Peso meta (kg)",
+      goalWeightHint: "O peso que você deseja alcançar",
+      loginButton: "Entrar",
+      registerButton: "Criar conta",
+      noAccount: "Não tem uma conta?",
+      hasAccount: "Já tem uma conta?",
+      signUp: "Cadastre-se",
+      signIn: "Entre",
+      welcome: "Bem-vindo ao",
+      welcomeBack: "Bem-vindo de volta!",
+      createAccount: "Crie sua conta",
+      trackYourWeight: "Acompanhe seu peso e alcance suas metas",
+      usernameRequired: "Nome de usuário é obrigatório",
+      passwordRequired: "Senha é obrigatória",
+      passwordMinLength: "A senha deve ter pelo menos 6 caracteres",
+      passwordsMatch: "As senhas não coincidem",
+      invalidCredentials: "Usuário ou senha inválidos",
+      usernameTaken: "Este nome de usuário já está em uso",
+      registerFailed: "Falha ao criar conta",
+      loginFailed: "Falha ao entrar",
+    },
     summary: {
       current: "Atual",
       change: "Variação",
       lowest: "Menor",
       highest: "Maior",
+      goal: "Meta",
       kg: "kg",
     },
     form: {
@@ -101,6 +164,11 @@ export const translations: Record<Language, Translations> = {
       cancel: "Cancelar",
       delete: "Excluir",
     },
+    goalReached: {
+      title: "Parabéns!",
+      message: "Você chegou na meta!",
+      dismiss: "Continuar",
+    },
     loading: {
       loadingData: "Carregando seus dados de peso...",
     },
@@ -118,11 +186,40 @@ export const translations: Record<Language, Translations> = {
     app: {
       title: "Weight Tracker",
     },
+    auth: {
+      login: "Login",
+      register: "Register",
+      logout: "Logout",
+      username: "Username",
+      password: "Password",
+      confirmPassword: "Confirm password",
+      goalWeight: "Goal weight (kg)",
+      goalWeightHint: "The weight you want to achieve",
+      loginButton: "Sign In",
+      registerButton: "Create Account",
+      noAccount: "Don't have an account?",
+      hasAccount: "Already have an account?",
+      signUp: "Sign Up",
+      signIn: "Sign In",
+      welcome: "Welcome to",
+      welcomeBack: "Welcome back!",
+      createAccount: "Create your account",
+      trackYourWeight: "Track your weight and reach your goals",
+      usernameRequired: "Username is required",
+      passwordRequired: "Password is required",
+      passwordMinLength: "Password must be at least 6 characters",
+      passwordsMatch: "Passwords do not match",
+      invalidCredentials: "Invalid username or password",
+      usernameTaken: "This username is already taken",
+      registerFailed: "Failed to create account",
+      loginFailed: "Failed to sign in",
+    },
     summary: {
       current: "Current",
       change: "Change",
       lowest: "Lowest",
       highest: "Highest",
+      goal: "Goal",
       kg: "kg",
     },
     form: {
@@ -156,6 +253,11 @@ export const translations: Record<Language, Translations> = {
       message: "Are you sure you want to delete this weight record? This action cannot be undone.",
       cancel: "Cancel",
       delete: "Delete",
+    },
+    goalReached: {
+      title: "Congratulations!",
+      message: "You've reached your goal!",
+      dismiss: "Continue",
     },
     loading: {
       loadingData: "Loading your weight data...",

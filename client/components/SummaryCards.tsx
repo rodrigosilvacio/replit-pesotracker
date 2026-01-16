@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { Spacing, BorderRadius, Typography, Colors } from "@/constants/theme";
 import { WeightSummary } from "@/types/weight";
 
@@ -14,6 +15,7 @@ interface SummaryCardsProps {
 export function SummaryCards({ summary }: SummaryCardsProps) {
   const { theme, isDark } = useTheme();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const formatWeight = (weight: number | null) => {
     if (weight === null) return "--";
@@ -60,46 +62,72 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
 
   return (
     <View style={styles.container}>
-      {cards.map((card, index) => (
+      <View style={styles.cardsGrid}>
+        {cards.map((card) => (
+          <View
+            key={card.label}
+            style={[
+              styles.card,
+              {
+                backgroundColor: theme.backgroundDefault,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            <ThemedText
+              style={[styles.label, { color: theme.textSecondary }]}
+            >
+              {card.label}
+            </ThemedText>
+            <View style={styles.valueRow}>
+              {card.icon ? (
+                <Feather
+                  name={card.icon}
+                  size={20}
+                  color={card.color}
+                  style={styles.icon}
+                />
+              ) : null}
+              <ThemedText style={[styles.value, { color: card.color }]}>
+                {card.value}
+              </ThemedText>
+            </View>
+            <ThemedText style={[styles.unit, { color: theme.textSecondary }]}>
+              {card.unit}
+            </ThemedText>
+          </View>
+        ))}
+      </View>
+      {user?.goalWeight ? (
         <View
-          key={card.label}
           style={[
-            styles.card,
+            styles.goalCard,
             {
               backgroundColor: theme.backgroundDefault,
-              borderColor: theme.border,
+              borderColor: theme.primary,
             },
           ]}
         >
-          <ThemedText
-            style={[styles.label, { color: theme.textSecondary }]}
-          >
-            {card.label}
-          </ThemedText>
-          <View style={styles.valueRow}>
-            {card.icon ? (
-              <Feather
-                name={card.icon}
-                size={20}
-                color={card.color}
-                style={styles.icon}
-              />
-            ) : null}
-            <ThemedText style={[styles.value, { color: card.color }]}>
-              {card.value}
+          <Feather name="target" size={20} color={theme.primary} />
+          <View style={styles.goalContent}>
+            <ThemedText style={[styles.goalLabel, { color: theme.textSecondary }]}>
+              {t.summary.goal}
+            </ThemedText>
+            <ThemedText style={[styles.goalValue, { color: theme.primary }]}>
+              {user.goalWeight.toFixed(1)} {t.summary.kg}
             </ThemedText>
           </View>
-          <ThemedText style={[styles.unit, { color: theme.textSecondary }]}>
-            {card.unit}
-          </ThemedText>
         </View>
-      ))}
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    gap: Spacing.sm,
+  },
+  cardsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: Spacing.sm,
@@ -135,5 +163,27 @@ const styles = StyleSheet.create({
   unit: {
     fontSize: Typography.caption.fontSize,
     marginTop: Spacing.xs,
+  },
+  goalCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    gap: Spacing.md,
+  },
+  goalContent: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  goalLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  goalValue: {
+    fontSize: 18,
+    fontWeight: "700",
   },
 });
