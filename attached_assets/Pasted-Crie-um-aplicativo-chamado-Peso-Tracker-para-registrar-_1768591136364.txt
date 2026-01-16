@@ -1,0 +1,121 @@
+Crie um aplicativo chamado **Peso Tracker** para **registrar o peso diário** e **visualizar a evolução ao longo do tempo**.
+
+### Objetivo
+
+O usuário informa **data** e **peso (kg)**. O app salva os registros e exibe:
+
+* **Lista** de registros (ordenada por data)
+* **Gráfico de evolução** do peso (linha ao longo do tempo)
+* **Resumo** com peso atual, variação (último - anterior), menor e maior peso do período
+
+---
+
+## Requisitos funcionais (MVP)
+
+1. **Adicionar registro**
+
+   * Campos: `data` (YYYY-MM-DD) e `peso` (número com 1–2 casas decimais)
+   * Validações:
+
+     * Data obrigatória
+     * Peso obrigatório, **> 0** e **< 500**
+     * Não permitir datas inválidas
+2. **Listar registros**
+
+   * Tabela com colunas: Data, Peso, Diferença vs. registro anterior
+   * Ordenar por data (crescente) e permitir alternar para decrescente
+3. **Editar e excluir registro**
+4. **Gráfico**
+
+   * Gráfico de linha com eixo X = data e eixo Y = peso
+   * Atualiza automaticamente ao incluir/editar/excluir
+5. **Persistência**
+
+   * Os dados devem permanecer salvos mesmo após reiniciar o Replit (usar banco local)
+
+---
+
+## Requisitos de interface (UI/UX)
+
+* Layout simples, limpo e responsivo (desktop e mobile)
+* Tela única (single page) com 3 blocos:
+
+  1. Formulário (Adicionar/Editar)
+  2. Gráfico de evolução
+  3. Tabela de registros
+* Mensagens de erro claras (validação) e confirmação ao excluir
+
+---
+
+## Stack técnica (escolha e implemente)
+
+Implemente como **monorepo** no mesmo Replit:
+
+### Backend
+
+* **Node.js + Express**
+* Banco: **SQLite**
+* Camada de acesso simples (sem ORM pesado; pode usar `better-sqlite3` ou `sqlite3`)
+* API REST:
+
+Endpoints:
+
+* `GET /api/weights` → lista registros
+* `POST /api/weights` → cria registro `{date, weight}`
+* `PUT /api/weights/:id` → atualiza
+* `DELETE /api/weights/:id` → remove
+
+Tabela `weights`:
+
+* `id` (PK autoincrement)
+* `date` (TEXT, unique ou permitir repetição — mas preferencialmente **1 registro por dia**)
+* `weight` (REAL)
+* `created_at` (TEXT)
+
+Regras:
+
+* Se já existir registro na mesma data, retornar erro amigável **ou** atualizar (defina uma abordagem consistente e documente).
+
+### Frontend
+
+* **React + Vite**
+* Gráfico: **Chart.js** (ou Recharts)
+* Consumo da API via `fetch`
+* Componentes sugeridos:
+
+  * `WeightForm`
+  * `WeightChart`
+  * `WeightTable`
+  * `SummaryCards`
+
+---
+
+## Extras (opcionais, mas desejáveis se couber)
+
+* Filtro por período (últimos 7/30/90 dias, ou intervalo)
+* Exportar CSV
+* Campo “meta de peso” e linha no gráfico mostrando a meta
+
+---
+
+## Requisitos de execução no Replit
+
+* Configurar scripts para rodar **frontend e backend juntos**:
+
+  * `npm run dev` inicia backend e frontend (pode usar `concurrently`)
+* Instruções no `README.md` com:
+
+  * Como rodar
+  * Estrutura do projeto
+  * Exemplos de uso da API
+
+---
+
+## Critérios de aceite
+
+* Consigo adicionar um peso para uma data, ver na tabela e ver no gráfico
+* Se eu recarregar a página ou reiniciar o Replit, os dados continuam lá
+* Editar e excluir refletem imediatamente na tabela e no gráfico
+* Validações impedem entradas inválidas
+
+Construa tudo com código organizado, comentários mínimos e foco em simplicidade e funcionamento.
