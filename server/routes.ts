@@ -2,7 +2,6 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { storage } from "./storage";
 import { insertWeightSchema, updateWeightSchema } from "@shared/schema";
-import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/weights", async (_req: Request, res: Response) => {
@@ -25,7 +24,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { date, weight } = parsed.data;
+      const { date, time, weight } = parsed.data;
 
       if (weight <= 0 || weight >= 500) {
         return res.status(400).json({ message: "Weight must be between 0 and 500 kg" });
@@ -36,15 +35,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Date must be in YYYY-MM-DD format" });
       }
 
-      const existingWeight = await storage.getWeightByDate(date);
-      if (existingWeight) {
-        return res.status(409).json({ 
-          message: "A weight record already exists for this date. Please edit the existing record instead.",
-          existingId: existingWeight.id
-        });
+      const timeRegex = /^\d{2}:\d{2}$/;
+      if (!timeRegex.test(time)) {
+        return res.status(400).json({ message: "Time must be in HH:MM format" });
       }
 
-      const newWeight = await storage.createWeight({ date, weight });
+      const newWeight = await storage.createWeight({ date, time, weight });
       res.status(201).json(newWeight);
     } catch (error) {
       console.error("Error creating weight:", error);
@@ -72,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { date, weight } = parsed.data;
+      const { date, time, weight } = parsed.data;
 
       if (weight !== undefined && (weight <= 0 || weight >= 500)) {
         return res.status(400).json({ message: "Weight must be between 0 and 500 kg" });
@@ -83,18 +79,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!dateRegex.test(date)) {
           return res.status(400).json({ message: "Date must be in YYYY-MM-DD format" });
         }
+      }
 
-        if (date !== existing.date) {
-          const existingForDate = await storage.getWeightByDate(date);
-          if (existingForDate) {
-            return res.status(409).json({ 
-              message: "A weight record already exists for this date" 
-            });
-          }
+      if (time !== undefined) {
+        const timeRegex = /^\d{2}:\d{2}$/;
+        if (!timeRegex.test(time)) {
+          return res.status(400).json({ message: "Time must be in HH:MM format" });
         }
       }
 
-      const updated = await storage.updateWeight(id, { date, weight });
+      const updated = await storage.updateWeight(id, { date, time, weight });
       res.json(updated);
     } catch (error) {
       console.error("Error updating weight:", error);

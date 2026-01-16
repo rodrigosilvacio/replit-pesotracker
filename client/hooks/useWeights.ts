@@ -19,12 +19,14 @@ export function useWeightSummary(weights: Weight[] | undefined): WeightSummary {
     };
   }
 
-  const sortedByDate = [...weights].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedByDateTime = [...weights].sort((a, b) => {
+    const dateTimeA = new Date(`${a.date}T${a.time}`).getTime();
+    const dateTimeB = new Date(`${b.date}T${b.time}`).getTime();
+    return dateTimeB - dateTimeA;
+  });
 
-  const currentWeight = sortedByDate[0]?.weight ?? null;
-  const previousWeight = sortedByDate[1]?.weight ?? null;
+  const currentWeight = sortedByDateTime[0]?.weight ?? null;
+  const previousWeight = sortedByDateTime[1]?.weight ?? null;
   const change = currentWeight !== null && previousWeight !== null
     ? currentWeight - previousWeight
     : null;
@@ -46,7 +48,7 @@ export function useCreateWeight() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { date: string; weight: number }) => {
+    mutationFn: async (data: { date: string; time: string; weight: number }) => {
       const response = await apiRequest("POST", "/api/weights", data);
       return response.json();
     },
@@ -60,7 +62,7 @@ export function useUpdateWeight() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: { date?: string; weight?: number } }) => {
+    mutationFn: async ({ id, data }: { id: number; data: { date?: string; time?: string; weight?: number } }) => {
       const response = await apiRequest("PUT", `/api/weights/${id}`, data);
       return response.json();
     },

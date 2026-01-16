@@ -1,6 +1,6 @@
 import { users, weights, type User, type InsertUser, type Weight, type InsertWeight } from "@shared/schema";
 import { db } from "./db";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq, asc, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -9,7 +9,7 @@ export interface IStorage {
   
   getAllWeights(): Promise<Weight[]>;
   getWeight(id: number): Promise<Weight | undefined>;
-  getWeightByDate(date: string): Promise<Weight | undefined>;
+  getWeightByDateTime(date: string, time: string): Promise<Weight | undefined>;
   createWeight(weight: InsertWeight): Promise<Weight>;
   updateWeight(id: number, data: Partial<InsertWeight>): Promise<Weight | undefined>;
   deleteWeight(id: number): Promise<boolean>;
@@ -32,7 +32,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllWeights(): Promise<Weight[]> {
-    return await db.select().from(weights).orderBy(asc(weights.date));
+    return await db.select().from(weights).orderBy(asc(weights.date), asc(weights.time));
   }
 
   async getWeight(id: number): Promise<Weight | undefined> {
@@ -40,8 +40,10 @@ export class DatabaseStorage implements IStorage {
     return weight || undefined;
   }
 
-  async getWeightByDate(date: string): Promise<Weight | undefined> {
-    const [weight] = await db.select().from(weights).where(eq(weights.date, date));
+  async getWeightByDateTime(date: string, time: string): Promise<Weight | undefined> {
+    const [weight] = await db.select().from(weights).where(
+      and(eq(weights.date, date), eq(weights.time, time))
+    );
     return weight || undefined;
   }
 

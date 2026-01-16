@@ -1,6 +1,7 @@
 export interface Weight {
   id: number;
   date: string;
+  time: string;
   weight: number;
   createdAt: string;
 }

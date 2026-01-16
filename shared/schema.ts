@@ -13,7 +13,8 @@ export const users = pgTable("users", {
 
 export const weights = pgTable("weights", {
   id: serial("id").primaryKey(),
-  date: text("date").notNull().unique(),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
   weight: real("weight").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -25,11 +26,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertWeightSchema = createInsertSchema(weights).pick({
   date: true,
+  time: true,
   weight: true,
 });
 
 export const updateWeightSchema = z.object({
   date: z.string().optional(),
+  time: z.string().optional(),
   weight: z.number().positive().max(500).optional(),
 });
 

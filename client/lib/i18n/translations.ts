@@ -15,6 +15,7 @@ export interface Translations {
     addWeight: string;
     editRecord: string;
     date: string;
+    time: string;
     weight: string;
     addRecord: string;
     update: string;
@@ -29,7 +30,7 @@ export interface Translations {
   };
   table: {
     title: string;
-    date: string;
+    dateTime: string;
     weight: string;
     diff: string;
     actions: string;
@@ -72,6 +73,7 @@ export const translations: Record<Language, Translations> = {
       addWeight: "Adicionar Peso",
       editRecord: "Editar Registro",
       date: "Data",
+      time: "Hora",
       weight: "Peso",
       addRecord: "Adicionar",
       update: "Atualizar",
@@ -86,7 +88,7 @@ export const translations: Record<Language, Translations> = {
     },
     table: {
       title: "Histórico de Peso",
-      date: "Data",
+      dateTime: "Data/Hora",
       weight: "Peso",
       diff: "Dif",
       actions: "Ações",
@@ -103,7 +105,7 @@ export const translations: Record<Language, Translations> = {
       loadingData: "Carregando seus dados de peso...",
     },
     errors: {
-      duplicateDate: "Já existe um registro para esta data",
+      duplicateDate: "Já existe um registro para esta data e hora",
       saveFailed: "Falha ao salvar registro de peso",
     },
     settings: {
@@ -127,6 +129,7 @@ export const translations: Record<Language, Translations> = {
       addWeight: "Add Weight",
       editRecord: "Edit Record",
       date: "Date",
+      time: "Time",
       weight: "Weight",
       addRecord: "Add Record",
       update: "Update",
@@ -141,7 +144,7 @@ export const translations: Record<Language, Translations> = {
     },
     table: {
       title: "Weight History",
-      date: "Date",
+      dateTime: "Date/Time",
       weight: "Weight",
       diff: "Diff",
       actions: "Actions",
@@ -158,7 +161,7 @@ export const translations: Record<Language, Translations> = {
       loadingData: "Loading your weight data...",
     },
     errors: {
-      duplicateDate: "A weight record already exists for this date",
+      duplicateDate: "A weight record already exists for this date and time",
       saveFailed: "Failed to save weight record",
     },
     settings: {

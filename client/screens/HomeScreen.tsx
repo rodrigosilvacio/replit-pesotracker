@@ -38,7 +38,7 @@ export default function HomeScreen() {
   const deleteMutation = useDeleteWeight();
 
   const handleSubmit = useCallback(
-    async (data: { date: string; weight: number }) => {
+    async (data: { date: string; time: string; weight: number }) => {
       setFormError(null);
       try {
         if (editingWeight) {

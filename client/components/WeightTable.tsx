@@ -39,16 +39,18 @@ export function WeightTable({
 
   const sortedWeights = useMemo(() => {
     return [...weights].sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      const dateTimeA = new Date(`${a.date}T${a.time}`).getTime();
+      const dateTimeB = new Date(`${b.date}T${b.time}`).getTime();
+      return sortOrder === "asc" ? dateTimeA - dateTimeB : dateTimeB - dateTimeA;
     });
   }, [weights, sortOrder]);
 
   const weightDiffs = useMemo(() => {
-    const chronological = [...weights].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    const chronological = [...weights].sort((a, b) => {
+      const dateTimeA = new Date(`${a.date}T${a.time}`).getTime();
+      const dateTimeB = new Date(`${b.date}T${b.time}`).getTime();
+      return dateTimeA - dateTimeB;
+    });
     const diffs: Record<number, number | null> = {};
     chronological.forEach((w, i) => {
       if (i === 0) {
@@ -79,14 +81,14 @@ export function WeightTable({
     }
   };
 
-  const formatDate = (dateStr: string) => {
+  const formatDateTime = (dateStr: string, timeStr: string) => {
     const date = new Date(dateStr + "T12:00:00");
     const locale = language === "pt" ? "pt-BR" : "en-US";
-    return date.toLocaleDateString(locale, {
+    const dateFormatted = date.toLocaleDateString(locale, {
       day: "2-digit",
       month: "2-digit",
-      year: "numeric",
     });
+    return `${dateFormatted} ${timeStr}`;
   };
 
   const formatDiff = (diff: number | null) => {
@@ -145,11 +147,13 @@ export function WeightTable({
         }}
       >
         <View style={[styles.cell, styles.dateCell]}>
-          <ThemedText style={styles.cellText}>{formatDate(item.date)}</ThemedText>
+          <ThemedText style={styles.cellText}>
+            {formatDateTime(item.date, item.time)}
+          </ThemedText>
         </View>
         <View style={[styles.cell, styles.weightCell]}>
           <ThemedText style={[styles.cellText, styles.weightText]}>
-            {item.weight.toFixed(1)} kg
+            {item.weight.toFixed(1)}
           </ThemedText>
         </View>
         <View style={[styles.cell, styles.diffCell]}>
@@ -213,19 +217,19 @@ export function WeightTable({
             size={14}
             color={theme.text}
           />
-          <ThemedText style={styles.sortText}>{t.table.date}</ThemedText>
+          <ThemedText style={styles.sortText}>{t.table.dateTime}</ThemedText>
         </Pressable>
       </View>
 
       <View style={[styles.tableHeader, { borderBottomColor: theme.border }]}>
         <View style={[styles.cell, styles.dateCell]}>
           <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            {t.table.date}
+            {t.table.dateTime}
           </ThemedText>
         </View>
         <View style={[styles.cell, styles.weightCell]}>
           <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            {t.table.weight}
+            kg
           </ThemedText>
         </View>
         <View style={[styles.cell, styles.diffCell]}>
@@ -233,11 +237,7 @@ export function WeightTable({
             {t.table.diff}
           </ThemedText>
         </View>
-        <View style={styles.actionsCell}>
-          <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            {t.table.actions}
-          </ThemedText>
-        </View>
+        <View style={styles.actionsCell} />
       </View>
 
       <FlatList
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   sortText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
   },
   tableHeader: {
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -380,10 +380,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   dateCell: {
-    flex: 2,
+    flex: 2.2,
   },
   weightCell: {
-    flex: 1.5,
+    flex: 1,
   },
   diffCell: {
     flex: 1,
@@ -391,11 +391,11 @@ const styles = StyleSheet.create({
   actionsCell: {
     flexDirection: "row",
     gap: Spacing.sm,
-    width: 60,
+    width: 56,
     justifyContent: "flex-end",
   },
   cellText: {
-    fontSize: 14,
+    fontSize: 13,
   },
   weightText: {
     fontWeight: "500",

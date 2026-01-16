@@ -17,7 +17,7 @@ import { Spacing, BorderRadius, Colors } from "@/constants/theme";
 import { Weight } from "@/types/weight";
 
 interface WeightFormProps {
-  onSubmit: (data: { date: string; weight: number }) => void;
+  onSubmit: (data: { date: string; time: string; weight: number }) => void;
   editingWeight?: Weight | null;
   onCancelEdit?: () => void;
   isLoading?: boolean;
@@ -34,16 +34,23 @@ export function WeightForm({
   const { theme, isDark } = useTheme();
   const { t, language } = useLanguage();
   const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
   const [weight, setWeight] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     if (editingWeight) {
       setDate(new Date(editingWeight.date + "T12:00:00"));
+      const [hours, minutes] = editingWeight.time.split(":").map(Number);
+      const timeDate = new Date();
+      timeDate.setHours(hours, minutes, 0, 0);
+      setTime(timeDate);
       setWeight(editingWeight.weight.toString());
     } else {
       setDate(new Date());
+      setTime(new Date());
       setWeight("");
     }
     setLocalError(null);
@@ -56,12 +63,27 @@ export function WeightForm({
     return `${year}-${month}-${day}`;
   };
 
+  const formatTime = (t: Date) => {
+    const hours = String(t.getHours()).padStart(2, "0");
+    const minutes = String(t.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   const formatDisplayDate = (d: Date) => {
     const locale = language === "pt" ? "pt-BR" : "en-US";
     return d.toLocaleDateString(locale, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+    });
+  };
+
+  const formatDisplayTime = (t: Date) => {
+    const locale = language === "pt" ? "pt-BR" : "en-US";
+    return t.toLocaleTimeString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
     });
   };
 
@@ -80,11 +102,16 @@ export function WeightForm({
     }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onSubmit({ date: formatDate(date), weight: weightValue });
+    onSubmit({ 
+      date: formatDate(date), 
+      time: formatTime(time),
+      weight: weightValue 
+    });
 
     if (!editingWeight) {
       setWeight("");
       setDate(new Date());
+      setTime(new Date());
     }
   };
 
@@ -92,6 +119,13 @@ export function WeightForm({
     setShowDatePicker(Platform.OS === "ios");
     if (selectedDate) {
       setDate(selectedDate);
+    }
+  };
+
+  const handleTimeChange = (_event: any, selectedTime?: Date) => {
+    setShowTimePicker(Platform.OS === "ios");
+    if (selectedTime) {
+      setTime(selectedTime);
     }
   };
 
@@ -126,14 +160,37 @@ export function WeightForm({
               },
             ]}
           >
-            <Feather name="calendar" size={18} color={theme.textSecondary} />
+            <Feather name="calendar" size={16} color={theme.textSecondary} />
             <ThemedText style={styles.dateText}>
               {formatDisplayDate(date)}
             </ThemedText>
           </Pressable>
         </View>
 
-        <View style={styles.inputWrapper}>
+        <View style={styles.timeWrapper}>
+          <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
+            {t.form.time}
+          </ThemedText>
+          <Pressable
+            onPress={() => setShowTimePicker(true)}
+            style={[
+              styles.dateInput,
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            <Feather name="clock" size={16} color={theme.textSecondary} />
+            <ThemedText style={styles.dateText}>
+              {formatDisplayTime(time)}
+            </ThemedText>
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.weightRow}>
+        <View style={styles.weightWrapper}>
           <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
             {t.form.weight}
           </ThemedText>
@@ -223,6 +280,16 @@ export function WeightForm({
           maximumDate={new Date()}
         />
       ) : null}
+
+      {showTimePicker ? (
+        <DateTimePicker
+          value={time}
+          mode="time"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={handleTimeChange}
+          is24Hour={true}
+        />
+      ) : null}
     </View>
   );
 }
@@ -240,13 +307,22 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   inputWrapper: {
+    flex: 1.2,
+  },
+  timeWrapper: {
+    flex: 0.8,
+  },
+  weightRow: {
+    marginTop: Spacing.md,
+  },
+  weightWrapper: {
     flex: 1,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
     marginBottom: Spacing.xs,
     textTransform: "uppercase",
@@ -262,7 +338,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 15,
   },
   weightInputContainer: {
     flexDirection: "row",
