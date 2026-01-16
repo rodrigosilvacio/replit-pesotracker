@@ -2,9 +2,17 @@
 
 ## Overview
 
-Peso Tracker is a personal health companion app for tracking daily weight and visualizing progression over time. Users can record their weight with a date, view their data in a line chart, and review their history in a sortable table. The app displays summary statistics including current weight, weight change, lowest, and highest weights.
+Peso Tracker is a personal health companion app for tracking daily weight and visualizing progression over time. Users can register an account with a goal weight, log in, and track their weight measurements with date and time. The app displays a line chart visualization and a sortable history table. Summary statistics include current weight, weight change, lowest, highest, and goal weights. When users reach their goal weight, a congratulations modal is displayed.
 
 The application is built as a cross-platform mobile/web app using Expo (React Native) with an Express.js backend API and PostgreSQL database for persistence.
+
+## Key Features
+
+- **User Authentication**: Registration with goal weight, login, logout with session management
+- **Goal Weight Tracking**: Users set a target weight during registration, displayed in summary cards
+- **Goal Achievement**: Congratulations modal when user's weight reaches or goes below their goal
+- **Multi-language Support**: Portuguese (default) and English with persistent preferences
+- **Multiple Entries Per Day**: Weight entries track both date and time for flexibility
 
 ## User Preferences
 
@@ -39,8 +47,8 @@ Preferred communication style: Simple, everyday language.
 **ORM**: Drizzle ORM with PostgreSQL dialect. Schema defined in `shared/schema.ts` and shared between frontend (for types) and backend (for database operations).
 
 **Schema**: 
-- `weights` table: id (serial), date (text, unique), weight (real), createdAt (timestamp)
-- `users` table: id (uuid), username (text), password (text) - prepared for future auth
+- `users` table: id (uuid), username (text, unique), password (text, hashed with scrypt), goalWeight (real, optional), createdAt (timestamp)
+- `weights` table: id (serial), userId (uuid, foreign key to users), date (text), time (text), weight (real), createdAt (timestamp) - unique constraint on (userId, date, time)
 
 **Validation**: Zod schemas generated from Drizzle schema using `drizzle-zod`, ensuring consistent validation across client and server.
 
