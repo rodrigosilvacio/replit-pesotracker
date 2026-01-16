@@ -12,6 +12,7 @@ import * as Haptics from "expo-haptics";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useTheme } from "@/hooks/useTheme";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Spacing, BorderRadius, Colors } from "@/constants/theme";
 import { Weight } from "@/types/weight";
 
@@ -31,6 +32,7 @@ export function WeightTable({
   isDeleting,
 }: WeightTableProps) {
   const { theme, isDark } = useTheme();
+  const { t, language } = useLanguage();
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [weightToDelete, setWeightToDelete] = useState<Weight | null>(null);
@@ -79,7 +81,8 @@ export function WeightTable({
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + "T12:00:00");
-    return date.toLocaleDateString("pt-BR", {
+    const locale = language === "pt" ? "pt-BR" : "en-US";
+    return date.toLocaleDateString(locale, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -114,9 +117,9 @@ export function WeightTable({
         <View style={[styles.emptyIconContainer, { backgroundColor: theme.backgroundSecondary }]}>
           <Feather name="clipboard" size={40} color={theme.primary} />
         </View>
-        <ThemedText style={styles.emptyTitle}>No entries yet</ThemedText>
+        <ThemedText style={styles.emptyTitle}>{t.table.noEntries}</ThemedText>
         <ThemedText style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-          Start tracking your weight today
+          {t.table.noEntriesDescription}
         </ThemedText>
       </View>
     );
@@ -194,7 +197,7 @@ export function WeightTable({
       ]}
     >
       <View style={styles.header}>
-        <ThemedText style={styles.title}>Weight History</ThemedText>
+        <ThemedText style={styles.title}>{t.table.title}</ThemedText>
         <Pressable
           onPress={toggleSort}
           style={({ pressed }) => [
@@ -210,29 +213,29 @@ export function WeightTable({
             size={14}
             color={theme.text}
           />
-          <ThemedText style={styles.sortText}>Date</ThemedText>
+          <ThemedText style={styles.sortText}>{t.table.date}</ThemedText>
         </Pressable>
       </View>
 
       <View style={[styles.tableHeader, { borderBottomColor: theme.border }]}>
         <View style={[styles.cell, styles.dateCell]}>
           <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            Date
+            {t.table.date}
           </ThemedText>
         </View>
         <View style={[styles.cell, styles.weightCell]}>
           <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            Weight
+            {t.table.weight}
           </ThemedText>
         </View>
         <View style={[styles.cell, styles.diffCell]}>
           <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            Diff
+            {t.table.diff}
           </ThemedText>
         </View>
         <View style={styles.actionsCell}>
           <ThemedText style={[styles.headerText, { color: theme.textSecondary }]}>
-            Actions
+            {t.table.actions}
           </ThemedText>
         </View>
       </View>
@@ -260,10 +263,9 @@ export function WeightTable({
                 color={Colors[isDark ? "dark" : "light"].error}
               />
             </View>
-            <ThemedText style={styles.modalTitle}>Delete Record?</ThemedText>
+            <ThemedText style={styles.modalTitle}>{t.deleteModal.title}</ThemedText>
             <ThemedText style={[styles.modalMessage, { color: theme.textSecondary }]}>
-              Are you sure you want to delete this weight record? This action
-              cannot be undone.
+              {t.deleteModal.message}
             </ThemedText>
             <View style={styles.modalButtons}>
               <Pressable
@@ -277,7 +279,7 @@ export function WeightTable({
                   },
                 ]}
               >
-                <ThemedText>Cancel</ThemedText>
+                <ThemedText>{t.deleteModal.cancel}</ThemedText>
               </Pressable>
               <Pressable
                 onPress={confirmDelete}
@@ -295,7 +297,7 @@ export function WeightTable({
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <ThemedText style={{ color: "#FFFFFF", fontWeight: "600" }}>
-                    Delete
+                    {t.deleteModal.delete}
                   </ThemedText>
                 )}
               </Pressable>

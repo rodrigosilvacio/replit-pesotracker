@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Spacing, BorderRadius, Typography, Colors } from "@/constants/theme";
 import { WeightSummary } from "@/types/weight";
 
@@ -12,6 +13,7 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ summary }: SummaryCardsProps) {
   const { theme, isDark } = useTheme();
+  const { t } = useLanguage();
 
   const formatWeight = (weight: number | null) => {
     if (weight === null) return "--";
@@ -30,28 +32,28 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
 
   const cards = [
     {
-      label: "Current",
+      label: t.summary.current,
       value: formatWeight(summary.currentWeight),
-      unit: "kg",
+      unit: t.summary.kg,
       color: theme.primary,
     },
     {
-      label: "Change",
+      label: t.summary.change,
       value: summary.change !== null ? `${summary.change >= 0 ? "+" : ""}${summary.change.toFixed(1)}` : "--",
-      unit: "kg",
+      unit: t.summary.kg,
       color: getChangeColor(),
       icon: getChangeIcon(),
     },
     {
-      label: "Lowest",
+      label: t.summary.lowest,
       value: formatWeight(summary.lowestWeight),
-      unit: "kg",
+      unit: t.summary.kg,
       color: Colors[isDark ? "dark" : "light"].success,
     },
     {
-      label: "Highest",
+      label: t.summary.highest,
       value: formatWeight(summary.highestWeight),
-      unit: "kg",
+      unit: t.summary.kg,
       color: Colors[isDark ? "dark" : "light"].error,
     },
   ];

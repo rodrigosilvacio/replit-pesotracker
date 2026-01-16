@@ -12,6 +12,7 @@ import * as Haptics from "expo-haptics";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Spacing, BorderRadius, Colors } from "@/constants/theme";
 import { Weight } from "@/types/weight";
 
@@ -31,6 +32,7 @@ export function WeightForm({
   error,
 }: WeightFormProps) {
   const { theme, isDark } = useTheme();
+  const { t, language } = useLanguage();
   const [date, setDate] = useState(new Date());
   const [weight, setWeight] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -55,7 +57,8 @@ export function WeightForm({
   };
 
   const formatDisplayDate = (d: Date) => {
-    return d.toLocaleDateString("pt-BR", {
+    const locale = language === "pt" ? "pt-BR" : "en-US";
+    return d.toLocaleDateString(locale, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -67,12 +70,12 @@ export function WeightForm({
 
     const weightValue = parseFloat(weight.replace(",", "."));
     if (isNaN(weightValue)) {
-      setLocalError("Please enter a valid weight");
+      setLocalError(t.form.validWeight);
       return;
     }
 
     if (weightValue <= 0 || weightValue >= 500) {
-      setLocalError("Weight must be between 0 and 500 kg");
+      setLocalError(t.form.weightRange);
       return;
     }
 
@@ -105,13 +108,13 @@ export function WeightForm({
       ]}
     >
       <ThemedText style={styles.title}>
-        {editingWeight ? "Edit Record" : "Add Weight"}
+        {editingWeight ? t.form.editRecord : t.form.addWeight}
       </ThemedText>
 
       <View style={styles.row}>
         <View style={styles.inputWrapper}>
           <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
-            Date
+            {t.form.date}
           </ThemedText>
           <Pressable
             onPress={() => setShowDatePicker(true)}
@@ -132,7 +135,7 @@ export function WeightForm({
 
         <View style={styles.inputWrapper}>
           <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
-            Weight
+            {t.form.weight}
           </ThemedText>
           <View
             style={[
@@ -178,7 +181,7 @@ export function WeightForm({
               },
             ]}
           >
-            <ThemedText style={{ color: theme.text }}>Cancel</ThemedText>
+            <ThemedText style={{ color: theme.text }}>{t.form.cancel}</ThemedText>
           </Pressable>
         ) : null}
 
@@ -204,7 +207,7 @@ export function WeightForm({
                 color="#FFFFFF"
               />
               <ThemedText style={styles.submitText}>
-                {editingWeight ? "Update" : "Add Record"}
+                {editingWeight ? t.form.update : t.form.addRecord}
               </ThemedText>
             </>
           )}

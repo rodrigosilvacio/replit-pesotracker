@@ -2,13 +2,12 @@ import React from "react";
 import { View, StyleSheet, Image } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Spacing } from "@/constants/theme";
 
-interface HeaderTitleProps {
-  title: string;
-}
+export function HeaderTitle() {
+  const { t } = useLanguage();
 
-export function HeaderTitle({ title }: HeaderTitleProps) {
   return (
     <View style={styles.container}>
       <Image
@@ -16,7 +15,7 @@ export function HeaderTitle({ title }: HeaderTitleProps) {
         style={styles.icon}
         resizeMode="contain"
       />
-      <ThemedText style={styles.title}>{title}</ThemedText>
+      <ThemedText style={styles.title}>{t.app.title}</ThemedText>
     </View>
   );
 }

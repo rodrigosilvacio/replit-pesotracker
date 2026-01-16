@@ -2,6 +2,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "@/screens/HomeScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 
 export type HomeStackParamList = {
@@ -19,7 +20,8 @@ export default function HomeStackNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="Peso Tracker" />,
+          headerTitle: () => <HeaderTitle />,
+          headerRight: () => <LanguageSelector />,
         }}
       />
     </Stack.Navigator>

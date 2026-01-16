@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
-import { View, StyleSheet, Dimensions, Text } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import Svg, { Path, Circle, Line, Text as SvgText, G, Defs, LinearGradient, Stop } from "react-native-svg";
 import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { Spacing, BorderRadius, Colors } from "@/constants/theme";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { Spacing, BorderRadius } from "@/constants/theme";
 import { Weight } from "@/types/weight";
 
 interface WeightChartProps {
@@ -12,7 +13,8 @@ interface WeightChartProps {
 }
 
 export function WeightChart({ weights }: WeightChartProps) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
+  const { t } = useLanguage();
   const screenWidth = Dimensions.get("window").width;
   const chartWidth = screenWidth - Spacing.lg * 4;
   const chartHeight = 200;
@@ -112,9 +114,9 @@ export function WeightChart({ weights }: WeightChartProps) {
         <View style={[styles.emptyIconContainer, { backgroundColor: theme.backgroundSecondary }]}>
           <Feather name="trending-up" size={40} color={theme.primary} />
         </View>
-        <ThemedText style={styles.emptyTitle}>No data yet</ThemedText>
+        <ThemedText style={styles.emptyTitle}>{t.chart.noData}</ThemedText>
         <ThemedText style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-          Add your first weight entry to see your progress chart
+          {t.chart.noDataDescription}
         </ThemedText>
       </View>
     );
@@ -130,7 +132,7 @@ export function WeightChart({ weights }: WeightChartProps) {
         },
       ]}
     >
-      <ThemedText style={styles.title}>Weight Evolution</ThemedText>
+      <ThemedText style={styles.title}>{t.chart.title}</ThemedText>
       <View style={styles.chartContainer}>
         <Svg width={chartWidth} height={chartHeight}>
           <Defs>

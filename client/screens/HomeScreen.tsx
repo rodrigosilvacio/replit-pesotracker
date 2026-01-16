@@ -11,7 +11,8 @@ import { WeightChart } from "@/components/WeightChart";
 import { WeightTable } from "@/components/WeightTable";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { Spacing, Colors } from "@/constants/theme";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { Spacing } from "@/constants/theme";
 import {
   useWeights,
   useWeightSummary,
@@ -24,7 +25,8 @@ import { Weight } from "@/types/weight";
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
+  const { t } = useLanguage();
 
   const [editingWeight, setEditingWeight] = useState<Weight | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -49,15 +51,15 @@ export default function HomeScreen() {
         }
       } catch (error: any) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        const message = error?.message || "Failed to save weight record";
+        const message = error?.message || t.errors.saveFailed;
         if (message.includes("409") || message.includes("already exists")) {
-          setFormError("A weight record already exists for this date");
+          setFormError(t.errors.duplicateDate);
         } else {
           setFormError(message);
         }
       }
     },
-    [editingWeight, createMutation, updateMutation]
+    [editingWeight, createMutation, updateMutation, t]
   );
 
   const handleEdit = useCallback((weight: Weight) => {
@@ -99,7 +101,7 @@ export default function HomeScreen() {
       >
         <ActivityIndicator size="large" color={theme.primary} />
         <ThemedText style={[styles.loadingText, { color: theme.textSecondary }]}>
-          Loading your weight data...
+          {t.loading.loadingData}
         </ThemedText>
       </View>
     );
